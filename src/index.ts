@@ -51,12 +51,10 @@ if (!fs.existsSync(uploadsDir)) {
 // HuggingFace API configuration
 const HF_API_TOKEN = process.env.HF_API_TOKEN;
 const HF_MODELS = {
-  'whisper-tiny': 'openai/whisper-tiny.en',
-  'whisper-base': 'openai/whisper-base.en',
-  'whisper-small': 'openai/whisper-small.en',
-  'whisper-medium': 'openai/whisper-medium.en',
-  'whisper-large': 'openai/whisper-large-v3'
+  'whisper-large': 'openai/whisper-large-v3',
+  'whisper-large-turbo': 'openai/whisper-large-v3-turbo',
 };
+// Then pick the model string (e.g., "openai/whisper-large-v3")
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -98,9 +96,9 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     const audioBuffer = fs.readFileSync(tempFilePath);
     
     // Choose model based on query parameter or default to tiny
-    const modelKey = req.query.model as string || 'whisper-tiny';
-    const modelName = HF_MODELS[modelKey as keyof typeof HF_MODELS] || HF_MODELS['whisper-tiny'];
-    
+    const modelKey = (req.query.model as string) || 'whisper-large';
+    const modelName = HF_MODELS[modelKey as keyof typeof HF_MODELS] || HF_MODELS['whisper-large'];
+
     console.log('🤖 Using model:', modelName);
 
     // Call HuggingFace Inference API
@@ -201,11 +199,8 @@ app.get('/api/models', (req, res) => {
 
 function getModelDescription(modelKey: string): string {
   const descriptions: Record<string, string> = {
-    'whisper-tiny': 'Fastest, least accurate (39 MB)',
-    'whisper-base': 'Good balance of speed and accuracy (74 MB)',
-    'whisper-small': 'Better accuracy, slower (244 MB)',
-    'whisper-medium': 'High accuracy, slower (769 MB)',
-    'whisper-large': 'Best accuracy, slowest (1550 MB)'
+    'whisper-large': 'Best accuracy, standard speed (1.5GB)',
+    'whisper-large-turbo': 'Best accuracy, faster and cheaper (newest, 1.5GB)'
   };
   return descriptions[modelKey] || 'Unknown model';
 }
