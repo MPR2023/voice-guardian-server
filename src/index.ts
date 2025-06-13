@@ -77,8 +77,9 @@ function getAudioMimeType(file: Express.Multer.File): string {
     case '.mp3': return 'audio/mpeg';
     case '.wav': return 'audio/wav';
     case '.ogg': return 'audio/ogg';
-    case '.m4a': return 'audio/mp4'; // or audio/x-m4a
+    case '.m4a': return 'audio/mp4'; // <-- Fix here!
     case '.flac': return 'audio/flac';
+    case '.aac': return 'audio/aac';
     default: return 'audio/wav'; // safest fallback
   }
 }
