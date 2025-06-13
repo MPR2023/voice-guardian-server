@@ -72,7 +72,6 @@ app.get('/health', (req, res) => {
 import type { File as MulterFile } from 'multer'; // (at the top, optional if you want explicit typing)
 
 function getAudioMimeType(file: Express.Multer.File): string {
-  // Always normalize problematic types
   if (
     file.mimetype === 'audio/x-m4a' ||
     file.mimetype === 'audio/m4a' ||
