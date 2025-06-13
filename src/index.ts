@@ -69,7 +69,9 @@ app.get('/health', (req, res) => {
   });
 });
 
-function getAudioMimeType(file) {
+import type { File as MulterFile } from 'multer'; // (at the top, optional if you want explicit typing)
+
+function getAudioMimeType(file: Express.Multer.File): string {
   // Always normalize problematic types
   if (
     file.mimetype === 'audio/x-m4a' ||
@@ -127,6 +129,12 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 
     console.log('🤖 Using model:', modelName);
     
+    
+    console.log('📤 Sending to HuggingFace:', {
+      contentType: getAudioMimeType(req.file),
+      originalName: req.file.originalname,
+      detectedMime: req.file.mimetype,
+    });
     // Call HuggingFace Inference API
     const response = await axios.post(
       `https://api-inference.huggingface.co/models/${modelName}`,
