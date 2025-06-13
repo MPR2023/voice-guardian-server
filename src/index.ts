@@ -69,6 +69,20 @@ app.get('/health', (req, res) => {
   });
 });
 
+function getAudioMimeType(file: Express.Multer.File): string {
+  // Fallback for common extensions if mimetype is missing or generic
+  if (file.mimetype && file.mimetype !== 'application/octet-stream') return file.mimetype;
+  const ext = path.extname(file.originalname).toLowerCase();
+  switch (ext) {
+    case '.mp3': return 'audio/mpeg';
+    case '.wav': return 'audio/wav';
+    case '.ogg': return 'audio/ogg';
+    case '.m4a': return 'audio/mp4'; // or audio/x-m4a
+    case '.flac': return 'audio/flac';
+    default: return 'audio/wav'; // safest fallback
+  }
+}
+
 // Transcription endpoint
 app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
   console.log('📥 Transcription request received');
@@ -112,7 +126,7 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
       {
         headers: {
           'Authorization': `Bearer ${HF_API_TOKEN}`,
-          'Content-Type': req.file.mimetype,
+          'Content-Type': getAudioMimeType(req.file),
         },
         maxBodyLength: 100 * 1024 * 1024, // 100MB limit
         timeout: 60000, // 60 second timeout
