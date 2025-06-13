@@ -127,6 +127,7 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
         headers: {
           'Authorization': `Bearer ${HF_API_TOKEN}`,
           'Content-Type': getAudioMimeType(req.file),
+          'Accept': 'application/json', // <- THIS LINE IS IMPORTANT
         },
         maxBodyLength: 100 * 1024 * 1024, // 100MB limit
         timeout: 60000, // 60 second timeout
