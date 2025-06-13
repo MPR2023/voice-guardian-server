@@ -126,12 +126,6 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
     const modelName = HF_MODELS[modelKey as keyof typeof HF_MODELS] || HF_MODELS['whisper-large'];
 
     console.log('🤖 Using model:', modelName);
-
-    console.log('📤 Sending to HuggingFace:', {
-      contentType: getAudioMimeType(req.file),
-      originalName: req.file.originalname,
-      detectedMime: req.file.mimetype,
-    });
     
     // Call HuggingFace Inference API
     const response = await axios.post(
