@@ -70,17 +70,19 @@ app.get('/health', (req, res) => {
 });
 
 function getAudioMimeType(file: Express.Multer.File): string {
-  // Fallback for common extensions if mimetype is missing or generic
+  // Always normalize problematic types
+  if (file.mimetype === 'audio/x-m4a' || file.mimetype === 'audio/m4a') return 'audio/mp4';
   if (file.mimetype && file.mimetype !== 'application/octet-stream') return file.mimetype;
   const ext = path.extname(file.originalname).toLowerCase();
   switch (ext) {
     case '.mp3': return 'audio/mpeg';
     case '.wav': return 'audio/wav';
     case '.ogg': return 'audio/ogg';
-    case '.m4a': return 'audio/mp4'; // <-- Fix here!
-    case '.flac': return 'audio/flac';
+    case '.m4a': return 'audio/mp4';  // <--- CRUCIAL!
     case '.aac': return 'audio/aac';
-    default: return 'audio/wav'; // safest fallback
+    case '.flac': return 'audio/flac';
+    case '.webm': return 'audio/webm';
+    default: return 'audio/wav';
   }
 }
 
