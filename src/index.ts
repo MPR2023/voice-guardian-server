@@ -69,16 +69,21 @@ app.get('/health', (req, res) => {
   });
 });
 
-function getAudioMimeType(file: Express.Multer.File): string {
+function getAudioMimeType(file) {
   // Always normalize problematic types
-  if (file.mimetype === 'audio/x-m4a' || file.mimetype === 'audio/m4a') return 'audio/mp4';
+  if (
+    file.mimetype === 'audio/x-m4a' ||
+    file.mimetype === 'audio/m4a' ||
+    path.extname(file.originalname).toLowerCase() === '.m4a'
+  ) {
+    return 'audio/mp4';
+  }
   if (file.mimetype && file.mimetype !== 'application/octet-stream') return file.mimetype;
   const ext = path.extname(file.originalname).toLowerCase();
   switch (ext) {
     case '.mp3': return 'audio/mpeg';
     case '.wav': return 'audio/wav';
     case '.ogg': return 'audio/ogg';
-    case '.m4a': return 'audio/mp4';  // <--- CRUCIAL!
     case '.aac': return 'audio/aac';
     case '.flac': return 'audio/flac';
     case '.webm': return 'audio/webm';
@@ -122,6 +127,12 @@ app.post('/api/transcribe', upload.single('audio'), async (req, res) => {
 
     console.log('🤖 Using model:', modelName);
 
+    console.log('📤 Sending to HuggingFace:', {
+      contentType: getAudioMimeType(req.file),
+      originalName: req.file.originalname,
+      detectedMime: req.file.mimetype,
+    });
+    
     // Call HuggingFace Inference API
     const response = await axios.post(
       `https://api-inference.huggingface.co/models/${modelName}`,
