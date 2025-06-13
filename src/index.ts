@@ -28,13 +28,17 @@ app.use(express.json());
 
 // Configure multer for file uploads
 const upload = multer({
-  dest: 'uploads/',
+  dest: '/tmp/', // For compatibility with Render and other cloud providers
   limits: {
     fileSize: 100 * 1024 * 1024, // 100MB limit
   },
   fileFilter: (req, file, cb) => {
-    // Accept audio files
-    if (file.mimetype.startsWith('audio/')) {
+  // Accept audio files or fallback if unsure
+    if (
+      (file.mimetype && file.mimetype.startsWith('audio/')) ||
+      file.fieldname === 'audio' ||
+      (file.originalname && file.originalname.match(/\.(mp3|wav|ogg|m4a|aac)$/i))
+    ) {
       cb(null, true);
     } else {
       cb(new Error('Only audio files are allowed'));
